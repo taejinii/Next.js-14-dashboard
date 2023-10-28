@@ -25,12 +25,19 @@ export async function createInvoice(formData: FormData) {
   const amountInCents = amount * 100;
   const date = new Date().toISOString().split("T")[0];
 
-  await sql`
-  INSERT INTO invoices (customer_id, amount, status, date)
-  VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
-`;
+  try {
+    await sql`
+    INSERT INTO invoices (customer_id, amount, status, date)
+    VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
+    `;
+  } catch (error) {
+    return {
+      message: "Database Error: Failed to Create Invoice.",
+    };
+  }
   // revalidatePath를 사용하면 특정 경로에 대해 캐시된 데이터를 온디맨드 방식으로 제거할수 있다. 즉 여기서 인보이스를 업데이트해서 /dashboard/invoices로 이동하면 해당 페이지는 캐시를 지웠기때문에 새로운데이터 요청을 보낼테고 데이터는 최신화된다.
   revalidatePath("/dashboard/invoices");
+  // try문이 작동해야 redirect된다. catch문이 실행되면 redirect가 안된다는뜻.
   redirect("/dashboard/invoices");
 }
 
@@ -45,18 +52,30 @@ export async function updateInvoice(formData: FormData) {
 
   const amountInCents = amount * 100;
 
-  await sql`
-      UPDATE invoices
-      SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
-      WHERE id = ${id}
-    `;
+  try {
+    await sql`
+        UPDATE invoices
+        SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
+        WHERE id = ${id}
+      `;
+  } catch (error) {
+    return { message: "Database Error: Failed to Update Invoice." };
+  }
 
   revalidatePath("/dashboard/invoices");
   redirect("/dashboard/invoices");
 }
 const DeleteInvoice = InvoiceSchema.pick({ id: true });
 export async function deleteInvoice(formData: FormData) {
-  const id = formData.get("id")?.toString();
-  await sql`DELETE FROM invoices WHERE id = ${id}`;
-  revalidatePath("/dashboard/invoices");
+  const { id } = DeleteInvoice.parse({
+    id: formData.get("id"),
+  });
+
+  try {
+    await sql`DELETE FROM invoices WHERE id = ${id}`;
+    revalidatePath("/dashboard/invoices");
+    return { message: "Deleted Invoice." };
+  } catch (error) {
+    return { message: "Database Error: Failed to Delete Invoice." };
+  }
 }
