@@ -1,3 +1,9 @@
+import CustomersTable from "@/app/ui/customers/table";
+
 export default function CustomerPage() {
-  return <p>Customer Page</p>;
+  return (
+    <div className="w-full">
+      <CustomersTable customers={[]} />
+    </div>
+  );
 }
