@@ -13,9 +13,12 @@ export default function Search({ placeholder }: { placeholder: string }) {
     // console.log(`Searching... ${term}`);
     const params = new URLSearchParams(searchParams);
     params.set("page", "1");
+
+    // 검색어가 있다면 쿼리스트링 설정 query=검색어
     if (term) {
       params.set("query", term);
     } else {
+      //검색어가 input에 없다면 쿼리 스트링 초기화
       params.delete("query");
     }
     // pathname을 넣어야 invocies url이 유지된다 params를 string으로 형변환하여 쿼리스트링의 형태로 바꿔준다.
