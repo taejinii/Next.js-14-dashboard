@@ -1,6 +1,6 @@
 # _Next.js 14 App Router Guide / Chapter-11_
 
-[Next.js 14 guide chapter-12](https://nextjs.org/learn/dashboard-app/adding-search-and-pagination)
+[Next.js 14 guide chapter-12](https://nextjs.org/learn/dashboard-app/mutating-data)
 
 # **Mutating Data**
 
